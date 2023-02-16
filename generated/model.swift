@@ -13,3 +13,45 @@ public struct MyStruct: Codable {
 		self.my_age = my_age
 	}
 }
+
+public enum BestHockeyTeams: Codable, Equatable {
+	case montrealCanadiens
+	case lies(String)
+
+	enum CodingKeys: String, CodingKey, Codable {
+		case montrealCanadiens = "MontrealCanadiens",
+			lies = "Lies"
+	}
+
+	private enum ContainerCodingKeys: String, CodingKey {
+		case type, content
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: ContainerCodingKeys.self)
+		if let type = try? container.decode(CodingKeys.self, forKey: .type) {
+			switch type {
+			case .montrealCanadiens:
+				self = .montrealCanadiens
+				return
+			case .lies:
+				if let content = try? container.decode(String.self, forKey: .content) {
+					self = .lies(content)
+					return
+				}
+			}
+		}
+		throw DecodingError.typeMismatch(BestHockeyTeams.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for BestHockeyTeams"))
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: ContainerCodingKeys.self)
+		switch self {
+		case .montrealCanadiens:
+			try container.encode(CodingKeys.montrealCanadiens, forKey: .type)
+		case .lies(let content):
+			try container.encode(CodingKeys.lies, forKey: .type)
+			try container.encode(content, forKey: .content)
+		}
+	}
+}
