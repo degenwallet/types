@@ -1,0 +1,11 @@
+# Cargo.toml
+[package]
+name = "types"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+typeshare = "1.0.0"
